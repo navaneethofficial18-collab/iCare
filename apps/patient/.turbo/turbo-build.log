@@ -1,0 +1,45 @@
+
+> patient-app@0.1.0 build
+> next build
+
+⨯ Failed to load next.config.ts, see more info here https://nextjs.org/docs/messages/next-config-error
+
+> Build error occurred
+Error: Cannot find module 'es-abstract/2024/Call'
+Require stack:
+- D:\Projects\caresync\node_modules\string.prototype.matchall\implementation.js
+- D:\Projects\caresync\node_modules\string.prototype.matchall\index.js
+- D:\Projects\caresync\node_modules\@surma\rollup-plugin-off-main-thread\index.js
+- D:\Projects\caresync\node_modules\@ducanh2912\next-pwa\node_modules\workbox-webpack-plugin\node_modules\workbox-build\build\lib\bundle.js
+- D:\Projects\caresync\node_modules\@ducanh2912\next-pwa\node_modules\workbox-webpack-plugin\build\generate-sw.js
+- D:\Projects\caresync\node_modules\@ducanh2912\next-pwa\node_modules\workbox-webpack-plugin\build\index.js
+- D:\Projects\caresync\node_modules\@ducanh2912\next-pwa\dist\index.cjs
+- D:\Projects\caresync\apps\patient\next.config.compiled.js
+- D:\Projects\caresync\node_modules\next\dist\build\next-config-ts\transpile-config.js
+- D:\Projects\caresync\node_modules\next\dist\server\config.js
+- D:\Projects\caresync\node_modules\next\dist\cli\next-test.js
+- D:\Projects\caresync\node_modules\next\dist\bin\next
+    at ignore-listed frames {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'D:\\Projects\\caresync\\node_modules\\string.prototype.matchall\\implementation.js',
+    'D:\\Projects\\caresync\\node_modules\\string.prototype.matchall\\index.js',
+    'D:\\Projects\\caresync\\node_modules\\@surma\\rollup-plugin-off-main-thread\\index.js',
+    'D:\\Projects\\caresync\\node_modules\\@ducanh2912\\next-pwa\\node_modules\\workbox-webpack-plugin\\node_modules\\workbox-build\\build\\lib\\bundle.js',
+    'D:\\Projects\\caresync\\node_modules\\@ducanh2912\\next-pwa\\node_modules\\workbox-webpack-plugin\\build\\generate-sw.js',
+    'D:\\Projects\\caresync\\node_modules\\@ducanh2912\\next-pwa\\node_modules\\workbox-webpack-plugin\\build\\index.js',
+    'D:\\Projects\\caresync\\node_modules\\@ducanh2912\\next-pwa\\dist\\index.cjs',
+    'D:\\Projects\\caresync\\apps\\patient\\next.config.compiled.js',
+    'D:\\Projects\\caresync\\node_modules\\next\\dist\\build\\next-config-ts\\transpile-config.js',
+    'D:\\Projects\\caresync\\node_modules\\next\\dist\\server\\config.js',
+    'D:\\Projects\\caresync\\node_modules\\next\\dist\\cli\\next-test.js',
+    'D:\\Projects\\caresync\\node_modules\\next\\dist\\bin\\next'
+  ]
+}
+npm error Lifecycle script `build` failed with error:
+npm error code 1
+npm error path D:\Projects\caresync\apps\patient
+npm error workspace patient-app@0.1.0
+npm error location D:\Projects\caresync\apps\patient
+npm error command failed
+npm error command C:\Windows\system32\cmd.exe /d /s /c next build
