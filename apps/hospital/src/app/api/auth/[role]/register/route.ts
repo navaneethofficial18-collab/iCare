@@ -4,6 +4,7 @@ import { usersTable, patientsTable, hospitalsTable, hospitalInvitesTable } from 
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { sendHospitalWelcomeEmail } from "@/lib/email";
 
 const patientRegisterSchema = z.object({
   email: z.string().email(),
@@ -86,6 +87,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ role: s
         // Mark invite as used
         await tx.update(hospitalInvitesTable).set({ status: "accepted" }).where(eq(hospitalInvitesTable.id, invite.id));
       });
+
+      try {
+        await sendHospitalWelcomeEmail(email, name);
+      } catch (emailError) {
+        console.warn("Welcome email could not be sent", emailError);
+      }
 
       return NextResponse.json({ message: "Hospital registered successfully" }, { status: 201 });
     }

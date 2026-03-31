@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { db } from "@/db";
+import { db, ensureAdminUser } from "@/db";
 import { usersTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
@@ -28,6 +28,10 @@ export async function POST(req: Request, { params }: { params: Promise<{ role: s
     }
 
     const { email, password } = parsed.data;
+
+    if (role === "admin") {
+      await ensureAdminUser();
+    }
 
     const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email)).limit(1);
     if (!user || user.role !== role) {

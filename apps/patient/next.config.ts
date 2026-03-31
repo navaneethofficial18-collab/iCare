@@ -6,15 +6,6 @@ const nextConfig: NextConfig = {
   transpilePackages: ['@caresync/db'],
 };
 
-const isDevelopment = process.env.NODE_ENV === "development";
-
-export default isDevelopment
-  ? nextConfig
-  : require("@ducanh2912/next-pwa").default({
-      dest: "public",
-      disable: false,
-      register: true,
-      skipWaiting: true,
-    })(nextConfig);
+export default nextConfig;
 
 

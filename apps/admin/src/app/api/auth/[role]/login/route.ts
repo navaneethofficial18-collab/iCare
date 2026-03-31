@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-import { db } from "@/db";
+import { db, ensureAdminUser } from "@/db";
 import { usersTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { signToken } from "@/lib/auth";
+import { AUTH_COOKIE_NAME } from "@/lib/auth-cookie";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -29,6 +30,13 @@ export async function POST(req: Request, { params }: { params: Promise<{ role: s
 
     const { email, password } = parsed.data;
 
+    if (role === "admin") {
+      await ensureAdminUser({
+        email: process.env.ADMIN_REFERENCE_ID,
+        password: process.env.ADMIN_PASSCODE,
+      });
+    }
+
     const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email)).limit(1);
     if (!user || user.role !== role) {
       return NextResponse.json({ error: "Invalid credentials or role mismatch" }, { status: 401 });
@@ -42,7 +50,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ role: s
     const token = await signToken({ sub: user.id, role: user.role, email: user.email });
 
     const response = NextResponse.json({ message: "Login successful", role: user.role });
-    response.cookies.set("jwt", token, {
+    response.cookies.set(AUTH_COOKIE_NAME, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

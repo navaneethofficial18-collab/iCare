@@ -3,9 +3,10 @@ import { verifyToken } from "@/lib/auth";
 import { db } from "@/db";
 import { usersTable, patientsTable, hospitalsTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { AUTH_COOKIE_NAME } from "@/lib/auth-cookie";
 
 export async function GET(req: NextRequest) {
-  const token = req.cookies.get("jwt")?.value;
+  const token = req.cookies.get(AUTH_COOKIE_NAME)?.value;
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const decoded = await verifyToken(token);

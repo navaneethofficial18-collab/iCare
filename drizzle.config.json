@@ -1,0 +1,12 @@
+{
+  "dialect": "mysql",
+  "schema": "./packages/db/src/schema.ts",
+  "out": "./drizzle",
+  "dbCredentials": {
+    "host": "127.0.0.1",
+    "port": 3306,
+    "user": "caresync_user",
+    "password": "caresync123",
+    "database": "caresync"
+  }
+}

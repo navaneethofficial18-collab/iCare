@@ -3,12 +3,22 @@ import { verifyToken } from "@/lib/auth";
 
 export async function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname;
-  const isPublicRoute = path === "/" || path.startsWith("/login") || path.startsWith("/register") || path.startsWith("/api/auth");
+  const isApiRoute = path.startsWith("/api/");
+  const isPublicRoute =
+    path === "/" ||
+    path.startsWith("/login") ||
+    path.startsWith("/register") ||
+    path.startsWith("/forgot-password") ||
+    path.startsWith("/reset-password") ||
+    path.startsWith("/api/auth");
 
   const token = req.cookies.get("jwt")?.value;
   const decoded = token ? await verifyToken(token) : null;
 
   if (!isPublicRoute && !decoded) {
+    if (isApiRoute) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
@@ -24,6 +34,9 @@ export async function proxy(req: NextRequest) {
 
   if (path.startsWith("/dashboard") && decoded?.role !== "patient") {
     // Colliding cookie from another port - clear and force login
+    if (isApiRoute) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
     const res = NextResponse.redirect(new URL("/login", req.url));
     res.cookies.delete("jwt");
     return res;

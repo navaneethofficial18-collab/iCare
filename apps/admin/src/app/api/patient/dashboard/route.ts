@@ -4,10 +4,11 @@ import { patientsTable, hospitalsTable, appointmentsTable, admissionsTable, medi
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 import { eq, desc } from "drizzle-orm";
+import { AUTH_COOKIE_NAME } from "@/lib/auth-cookie";
 
 async function verifyPatient() {
   const cookieStore = await cookies();
-  const token = cookieStore.get("jwt")?.value;
+  const token = cookieStore.get(AUTH_COOKIE_NAME)?.value;
   if (!token) return null;
 
   try {

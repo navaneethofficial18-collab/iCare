@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
+import { AUTH_COOKIE_NAME } from "@/lib/auth-cookie";
 
 async function verifyAccess(allowedRoles: string[]) {
   const cookieStore = await cookies();
-  const token = cookieStore.get("jwt")?.value;
+  const token = cookieStore.get(AUTH_COOKIE_NAME)?.value;
   if (!token) return false;
 
   try {
@@ -64,11 +65,16 @@ export async function POST(req: Request) {
     }
 
     const result = await response.json();
-    const generated_text = result[0]?.generated_text || "Unable to generate response.";
+    const generatedText =
+      Array.isArray(result) && result[0]?.generated_text
+        ? result[0].generated_text
+        : result?.generated_text || "Unable to generate response.";
 
-    return NextResponse.json({ response: generated_text.trim() });
+    return NextResponse.json({ response: String(generatedText).trim() });
   } catch (error) {
     console.error("AI Assistant Error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({
+      response: "Umkho.AI is temporarily unavailable. Please try again in a moment.",
+    });
   }
 }

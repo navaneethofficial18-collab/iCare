@@ -181,3 +181,15 @@
 2026-03-30T18:01:40.078467Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
 2026-03-30T18:01:40.186961Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\daemon\\a48b904d1b18ef1c-turbo.log.2026-03-30")}
 2026-03-30T18:01:40.186997Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-03-30T18:01:40.280688Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\daemon\\a48b904d1b18ef1c-turbo.log.2026-03-30")}
+2026-03-30T18:01:40.280711Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-03-30T18:02:51.888190Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\cookies\\4.cookie")}
+2026-03-30T18:02:51.888216Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-03-30T18:02:53.173738Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\cookies")}
+2026-03-30T18:02:53.173774Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-03-30T18:02:55.885160Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\hospital\\.next"), AnchoredSystemPathBuf("apps\\admin\\.next")}
+2026-03-30T18:02:55.885193Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("admin-app"), path: AnchoredSystemPathBuf("apps\\admin") }, WorkspacePackage { name: Other("hospital-app"), path: AnchoredSystemPathBuf("apps\\hospital") }}))
+2026-03-30T18:02:56.019678Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-03-30T18:02:56.019738Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-03-30T18:05:32.380909Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\daemon\\a48b904d1b18ef1c-turbo.log.2026-03-30")}
+2026-03-30T18:05:32.380942Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))

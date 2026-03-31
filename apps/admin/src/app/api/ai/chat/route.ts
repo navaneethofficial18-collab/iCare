@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
+import { AUTH_COOKIE_NAME } from "@/lib/auth-cookie";
 
 async function verifyAccess(allowedRoles: string[]) {
   const cookieStore = await cookies();
-  const token = cookieStore.get("jwt")?.value;
+  const token = cookieStore.get(AUTH_COOKIE_NAME)?.value;
   if (!token) return false;
 
   try {

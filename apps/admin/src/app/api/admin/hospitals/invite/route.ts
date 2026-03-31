@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { hospitalInvitesTable } from "@/db/schema";
+import { hospitalInvitesTable, usersTable } from "@/db/schema";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 import { eq } from "drizzle-orm";
+import { sendHospitalInviteEmail } from "@/lib/email";
+import { AUTH_COOKIE_NAME } from "@/lib/auth-cookie";
 
 async function verifyAdmin() {
   const cookieStore = await cookies();
-  const token = cookieStore.get("jwt")?.value;
+  const token = cookieStore.get(AUTH_COOKIE_NAME)?.value;
   if (!token) return false;
 
   try {
@@ -28,45 +30,34 @@ export async function POST(req: Request) {
     const { email } = await req.json();
     if (!email) return NextResponse.json({ error: "Email is required" }, { status: 400 });
 
-    const [existing] = await db.select().from(hospitalInvitesTable).where(eq(hospitalInvitesTable.email, email)).limit(1);
+    const normalizedEmail = String(email).trim().toLowerCase();
+    const [existingUser] = await db.select().from(usersTable).where(eq(usersTable.email, normalizedEmail)).limit(1);
+
+    if (existingUser) {
+      return NextResponse.json({ error: "This email is already registered in CareSync." }, { status: 409 });
+    }
+
+    const [existing] = await db.select().from(hospitalInvitesTable).where(eq(hospitalInvitesTable.email, normalizedEmail)).limit(1);
     
     if (existing && existing.status === "pending") {
-      return NextResponse.json({ message: "Invite originally sent", token: existing.token }, { status: 200 });
+      await sendHospitalInviteEmail(normalizedEmail, existing.token);
+      return NextResponse.json({ message: "Invite resent successfully", token: existing.token }, { status: 200 });
+    }
+
+    if (existing && existing.status === "accepted") {
+      return NextResponse.json({ error: "This hospital invitation has already been accepted." }, { status: 409 });
     }
 
     const token = crypto.randomUUID().replace(/-/g, "").slice(0, 16);
     
     await db.insert(hospitalInvitesTable).values({
       id: crypto.randomUUID(),
-      email,
+      email: normalizedEmail,
       token,
       status: "pending"
     });
 
-    try {
-      const nodemailer = require("nodemailer");
-      const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST || 'smtp.ethereal.email',
-        port: parseInt(process.env.SMTP_PORT || '587', 10),
-        auth: {
-            user: process.env.SMTP_USER || 'mcdonald.kuphal48@ethereal.email',
-            pass: process.env.SMTP_PASS || 'd8aYQ6Kz93V6hQYgY1'
-        }
-      });
-      
-      await transporter.sendMail({
-        from: '"iCare System Admin" <admin@icare.local>',
-        to: email,
-        subject: "iCare Hospital Registration Invite",
-        html: `<h2>Welcome to iCare!</h2>
-               <p>Your hospital has been authorized for the iCare ecosystem.</p>
-               <p>Your secure registration token is: <strong style="font-size: 1.2rem; color: #0284c7;">${token}</strong></p>
-               <br/><p>Please navigate to <b>localhost:5000/register</b> and register your provider account.</p>`
-      });
-      console.log(`Invite email dispatched to ${email}`);
-    } catch(err) {
-      console.warn("Mail dispatch failed, continuing without email...", err);
-    }
+    await sendHospitalInviteEmail(normalizedEmail, token);
 
     return NextResponse.json({ message: "Invite generated successfully", token }, { status: 201 });
   } catch (error) {

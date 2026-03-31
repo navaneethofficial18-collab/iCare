@@ -3,6 +3,23 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/ui/Loader";
 
+async function readApiResponse<T>(res: Response): Promise<T> {
+  const contentType = res.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    if (res.status === 401 || res.status === 403) {
+      throw new Error("Your session expired. Please log in again.");
+    }
+    throw new Error("The server returned an unexpected response.");
+  }
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data?.error ?? "Request failed");
+  }
+
+  return data as T;
+}
+
 export default function AdminDashboard() {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -19,8 +36,7 @@ export default function AdminDashboard() {
     async function init() {
       try {
         const res = await fetch("/api/auth/me");
-        if (!res.ok) throw new Error("Not logged in");
-        const data = await res.json();
+        const data = await readApiResponse<any>(res);
         if (data.user.role !== "admin") throw new Error("unauthorized");
         setProfile(data.user);
 
@@ -30,11 +46,11 @@ export default function AdminDashboard() {
           fetch("/api/admin/hospitals/invite")
         ]);
 
-        if (hospReq.ok) setHospitals(await hospReq.json());
-        if (invReq.ok) setInvites(await invReq.json());
+        setHospitals(await readApiResponse<any[]>(hospReq));
+        setInvites(await readApiResponse<any[]>(invReq));
 
       } catch (err) {
-        router.push("/login/admin"); 
+        router.push("/login"); 
       } finally {
         setLoading(false);
       }
@@ -52,15 +68,14 @@ export default function AdminDashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: inviteEmail })
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      const data = await readApiResponse<{ token: string; message: string }>(res);
 
-      setInviteMessage(`Invite Generated! Token: ${data.token}`);
+      setInviteMessage(`${data.message} Token: ${data.token}`);
       setInviteEmail("");
       
       // Refresh invites
       const invReq = await fetch("/api/admin/hospitals/invite");
-      if (invReq.ok) setInvites(await invReq.json());
+      setInvites(await readApiResponse<any[]>(invReq));
 
     } catch (err: any) {
       setInviteMessage("Error: " + err.message);
@@ -96,7 +111,7 @@ export default function AdminDashboard() {
         </div>
         <div className="flex items-center gap-4">
           <span className="text-sm font-semibold text-gray-700 hidden md:block bg-gray-100 px-3 py-1 rounded-full">{profile?.email}</span>
-          <button onClick={() => { fetch("/api/auth/logout", { method: "POST" }).then(() => router.push("/login/admin")); }} className="text-sm text-red-600 hover:text-white hover:bg-red-500 font-semibold transition border border-red-200 px-4 py-1.5 rounded-lg">Logout</button>
+          <button onClick={() => { fetch("/api/auth/logout", { method: "POST" }).then(() => router.push("/login")); }} className="text-sm text-red-600 hover:text-white hover:bg-red-500 font-semibold transition border border-red-200 px-4 py-1.5 rounded-lg">Logout</button>
         </div>
       </header>
       
