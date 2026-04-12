@@ -5,3 +5,11 @@
 2026-04-12T18:11:16.865603Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
 2026-04-12T18:11:18.154919Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\cookies")}
 2026-04-12T18:11:18.154949Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-04-12T18:19:08.463992Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\daemon\\a48b904d1b18ef1c-turbo.log.2026-04-12")}
+2026-04-12T18:19:08.464046Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-04-12T18:30:14.960620Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\admin\\src\\proxy.ts"), AnchoredSystemPathBuf("apps\\admin\\src\\middleware.ts"), AnchoredSystemPathBuf("apps\\admin\\src")}
+2026-04-12T18:30:14.960703Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("admin-app"), path: AnchoredSystemPathBuf("apps\\admin") }}))
+2026-04-12T18:30:24.166595Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\admin\\src\\middleware.ts")}
+2026-04-12T18:30:24.166629Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("admin-app"), path: AnchoredSystemPathBuf("apps\\admin") }}))
+2026-04-12T19:03:18.153333Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\daemon\\a48b904d1b18ef1c-turbo.log.2026-04-12")}
+2026-04-12T19:03:18.153450Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
