@@ -32,6 +32,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "This reset link is invalid or has expired." }, { status: 400 });
     }
 
+    const [user] = await db.select().from(usersTable).where(eq(usersTable.id, resetToken.userId)).limit(1);
+    if (!user || user.role !== "patient") {
+      return NextResponse.json({ error: "This reset link is invalid or has expired." }, { status: 400 });
+    }
+
     const passwordHash = await bcrypt.hash(password, 10);
 
     await db.transaction(async (tx) => {

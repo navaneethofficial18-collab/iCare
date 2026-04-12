@@ -1,36 +1,82 @@
 import { NextResponse, NextRequest } from "next/server";
 import { verifyToken } from "@/lib/auth";
+import { AUTH_COOKIE_NAME } from "@/lib/auth-cookie";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
+const redis = process.env.UPSTASH_REDIS_REST_URL
+  ? new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+    })
+  : null;
+
+const ratelimit = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(10, "10s"), // 10 requests per 10 seconds
+      analytics: true,
+    })
+  : null;
 
 export async function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname;
   const isApiRoute = path.startsWith("/api/");
-  const isPublicRoute = path === "/" || path.startsWith("/login") || path.startsWith("/register") || path.startsWith("/api/auth");
 
-  const token = req.cookies.get("jwt")?.value;
-  const decoded = token ? await verifyToken(token) : null;
+  // Rate limiting for API routes in production
+  if (isApiRoute && ratelimit) {
+    const ip = req.headers.get("x-forwarded-for") ?? req.ip ?? "127.0.0.1";
+    const { success } = await ratelimit.limit(ip);
+    if (!success) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
+  }
 
-  if (!isPublicRoute && !decoded) {
+  const isPublicRoute =
+    path === "/" ||
+    path.startsWith("/login") ||
+    path.startsWith("/register") ||
+    path.startsWith("/forgot-password") ||
+    path.startsWith("/reset-password") ||
+    path.startsWith("/api/auth");
+
+  const token = req.cookies.get(AUTH_COOKIE_NAME)?.value;
+  const decoded = (token ? await verifyToken(token) : null) as any;
+
+  const isAuthorized = decoded && decoded.sub && decoded.type === "access";
+
+  if (!isPublicRoute && !isAuthorized) {
     if (isApiRoute) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  if (isPublicRoute && decoded && (path.startsWith("/login") || path.startsWith("/register"))) {
-    if (decoded.role !== "hospital") {
-        const res = NextResponse.next();
-        res.cookies.delete("jwt");
-        return res;
+  if (isPublicRoute && isAuthorized && (path.startsWith("/login") || path.startsWith("/register"))) {
+    if (!["hospital", "doctor"].includes(decoded.role)) {
+      const res = NextResponse.next();
+      res.cookies.delete(AUTH_COOKIE_NAME);
+      return res;
     }
-    return NextResponse.redirect(new URL("/dashboard/hospital", req.url));
+    const target = decoded.role === "doctor" ? "/dashboard/doctor" : "/dashboard/hospital";
+    return NextResponse.redirect(new URL(target, req.url));
   }
 
-  if (path.startsWith("/dashboard") && decoded?.role !== "hospital") {
+  if (path.startsWith("/dashboard/hospital") && decoded?.role !== "hospital") {
     if (isApiRoute) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     const res = NextResponse.redirect(new URL("/login", req.url));
-    res.cookies.delete("jwt");
+    res.cookies.delete(AUTH_COOKIE_NAME);
+    return res;
+  }
+
+  if (path.startsWith("/dashboard/doctor") && decoded?.role !== "doctor") {
+    if (isApiRoute) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    const res = NextResponse.redirect(new URL("/login", req.url));
+    res.cookies.delete(AUTH_COOKIE_NAME);
     return res;
   }
 

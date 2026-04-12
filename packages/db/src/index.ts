@@ -5,9 +5,11 @@ import bcrypt from "bcryptjs";
 
 import { usersTable } from "./schema";
 
+type Db = ReturnType<typeof drizzle>;
+
 const globalForDb = globalThis as typeof globalThis & {
-  __caresyncPool?: mysql.Pool;
-  __caresyncDb?: ReturnType<typeof drizzle>;
+  __caresyncPool?: any;
+  __caresyncDb?: Db;
   __caresyncAdminSeeded?: Promise<void>;
 };
 
@@ -19,15 +21,19 @@ function getRequiredEnv(name: string, fallback?: string) {
   return value;
 }
 
-function createPool() {
+function createPool(host?: string) {
   return mysql.createPool({
-    host: getRequiredEnv("DB_HOST", "127.0.0.1"),
+    host: host ?? getRequiredEnv("DB_HOST", "127.0.0.1"),
     port: Number(process.env.DB_PORT ?? 3306),
     user: getRequiredEnv("DB_USER"),
     password: getRequiredEnv("DB_PASSWORD"),
     database: getRequiredEnv("DB_NAME"),
     waitForConnections: true,
-    connectionLimit: 10,
+    connectionLimit: process.env.NODE_ENV === "production" ? 50 : 10,
+    maxIdle: process.env.NODE_ENV === "production" ? 10 : 2,
+    idleTimeout: 60000, // 60 seconds
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 0,
     queueLimit: 0,
   });
 }
@@ -35,12 +41,17 @@ function createPool() {
 const pool = globalForDb.__caresyncPool ?? createPool();
 const db = globalForDb.__caresyncDb ?? drizzle(pool);
 
+// Preparing for multi-db setup (Read Replicas)
+const readReplicaHost = process.env.DB_READ_REPLICA_HOST;
+const readPool = readReplicaHost ? createPool(readReplicaHost) : pool;
+const readDb = readReplicaHost ? drizzle(readPool) : db;
+
 if (process.env.NODE_ENV !== "production") {
   globalForDb.__caresyncPool = pool;
   globalForDb.__caresyncDb = db;
 }
 
-export { db, pool };
+export { db, readDb, pool, readPool };
 export * from "./schema";
 
 export async function ensureAdminUser(options?: {

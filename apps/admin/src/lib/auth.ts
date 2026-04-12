@@ -3,11 +3,19 @@ import { SignJWT, jwtVerify } from "jose";
 const JWT_SECRET = process.env.JWT_SECRET || "caresync_super_secret_key";
 const encodedSecret = new TextEncoder().encode(JWT_SECRET);
 
-export async function signToken(payload: any) {
-  return new SignJWT(payload)
+export async function signAccessToken(payload: any) {
+  return new SignJWT({ ...payload, type: "access" })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime(process.env.JWT_EXPIRES_IN || "7d")
+    .setExpirationTime("15m")
+    .sign(encodedSecret);
+}
+
+export async function signRefreshToken(payload: any) {
+  return new SignJWT({ sub: payload.sub, type: "refresh" })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("7d")
     .sign(encodedSecret);
 }
 

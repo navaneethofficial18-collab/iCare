@@ -16,7 +16,7 @@ export async function POST(req: Request) {
 
     const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email)).limit(1);
 
-    if (user) {
+    if (user?.role === "patient") {
       const rawToken = randomBytes(32).toString("hex");
       const tokenHash = createHash("sha256").update(rawToken).digest("hex");
       const expiresAt = new Date(Date.now() + 60 * 60 * 1000);

@@ -7,6 +7,7 @@ import {
   text,
   boolean,
   varchar,
+  index,
 } from "drizzle-orm/mysql-core";
 
 const idColumn = (name = "id") =>
@@ -22,10 +23,13 @@ export const usersTable = mysqlTable("users", {
   id: idColumn(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   passwordHash: varchar("password_hash", { length: 255 }).notNull(),
-  role: mysqlEnum("role", ["patient", "hospital", "admin"]).default("patient"),
+  role: mysqlEnum("role", ["patient", "hospital", "admin", "doctor"]).default("patient"),
   createdAt: createdAtColumn(),
   updatedAt: updatedAtColumn(),
-});
+}, (table) => ({
+  emailIdx: index("email_idx").on(table.email),
+  roleIdx: index("role_idx").on(table.role),
+}));
 
 export const patientsTable = mysqlTable("patients", {
   id: idColumn(),
@@ -36,7 +40,9 @@ export const patientsTable = mysqlTable("patients", {
   allergies: text("allergies"),
   createdAt: createdAtColumn(),
   updatedAt: updatedAtColumn(),
-});
+}, (table) => ({
+  userIdIdx: index("user_id_idx").on(table.userId),
+}));
 
 export const hospitalsTable = mysqlTable("hospitals", {
   id: idColumn(),
@@ -47,7 +53,10 @@ export const hospitalsTable = mysqlTable("hospitals", {
   approvalStatus: mysqlEnum("approval_status", ["pending", "approved", "rejected"]).default("pending"),
   createdAt: createdAtColumn(),
   updatedAt: updatedAtColumn(),
-});
+}, (table) => ({
+  userIdIdx: index("user_id_idx").on(table.userId),
+  approvalStatusIdx: index("approval_status_idx").on(table.approvalStatus),
+}));
 
 export const doctorsTable = mysqlTable("doctors", {
   id: idColumn(),
@@ -59,7 +68,10 @@ export const doctorsTable = mysqlTable("doctors", {
   isAvailable: boolean("is_available").default(true),
   createdAt: createdAtColumn(),
   updatedAt: updatedAtColumn(),
-});
+}, (table) => ({
+  hospitalIdIdx: index("hospital_id_idx").on(table.hospitalId),
+  userIdIdx: index("user_id_idx").on(table.userId),
+}));
 
 export const appointmentsTable = mysqlTable("appointments", {
   id: idColumn(),
@@ -73,7 +85,12 @@ export const appointmentsTable = mysqlTable("appointments", {
   symptoms: text("symptoms"),
   createdAt: createdAtColumn(),
   updatedAt: updatedAtColumn(),
-});
+}, (table) => ({
+  patientIdIdx: index("patient_id_idx").on(table.patientId),
+  hospitalIdIdx: index("hospital_id_idx").on(table.hospitalId),
+  doctorIdIdx: index("doctor_id_idx").on(table.doctorId),
+  appointmentDateIdx: index("appointment_date_idx").on(table.appointmentDate),
+}));
 
 export const admissionsTable = mysqlTable("admissions", {
   id: idColumn(),
@@ -87,7 +104,10 @@ export const admissionsTable = mysqlTable("admissions", {
   reason: text("reason"),
   createdAt: createdAtColumn(),
   updatedAt: updatedAtColumn(),
-});
+}, (table) => ({
+  patientIdIdx: index("patient_id_idx").on(table.patientId),
+  hospitalIdIdx: index("hospital_id_idx").on(table.hospitalId),
+}));
 
 export const hospitalInvitesTable = mysqlTable("hospital_invites", {
   id: idColumn(),
@@ -136,7 +156,11 @@ export const medicalRecordsTable = mysqlTable("medical_records", {
   description: text("description"),
   fileUrl: varchar("file_url", { length: 500 }),
   recordDate: datetime("record_date", { mode: "date" }).default(sql`CURRENT_TIMESTAMP`),
-});
+}, (table) => ({
+  patientIdIdx: index("patient_id_idx").on(table.patientId),
+  hospitalIdIdx: index("hospital_id_idx").on(table.hospitalId),
+  recordDateIdx: index("record_date_idx").on(table.recordDate),
+}));
 
 export const prescriptionsTable = mysqlTable("prescriptions", {
   id: idColumn(),

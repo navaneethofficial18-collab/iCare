@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const decoded = await verifyToken(token);
-  if (!decoded || !decoded.sub) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!decoded || !decoded.sub || decoded.type !== "access") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
     const [user] = await db.select().from(usersTable).where(eq(usersTable.id, decoded.sub as string)).limit(1);

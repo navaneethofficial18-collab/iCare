@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-Dimport { db, ensureAdminUser } from "@/db";
+import { db, ensureAdminUser } from "@/db";
 import { usersTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
-import { signToken } from "@/lib/auth";
+import { signAccessToken, signRefreshToken } from "@/lib/auth";
+import { AUTH_COOKIE_NAME } from "@/lib/auth-cookie";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -46,13 +47,22 @@ export async function POST(req: Request, { params }: { params: Promise<{ role: s
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
-    const token = await signToken({ sub: user.id, role: user.role, email: user.email });
+    const accessToken = await signAccessToken({ sub: user.id, role: user.role, email: user.email });
+    const refreshToken = await signRefreshToken({ sub: user.id });
 
     const response = NextResponse.json({ message: "Login successful", role: user.role });
-    response.cookies.set("jwt", token, {
+    response.cookies.set(AUTH_COOKIE_NAME, accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
+      maxAge: 15 * 60, // 15 minutes
+      path: "/",
+    });
+
+    response.cookies.set("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60, // 7 days
       path: "/",
     });

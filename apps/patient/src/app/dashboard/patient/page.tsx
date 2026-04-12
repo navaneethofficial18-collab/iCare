@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/ui/Loader";
 
@@ -8,8 +8,6 @@ export default function PatientDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("home");
   const router = useRouter();
-
-  // AI Chat State
   const [chatMessages, setChatMessages] = useState<{ role: string; content: string }[]>([]);
   const [aiInput, setAiInput] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
@@ -47,7 +45,6 @@ export default function PatientDashboard() {
       const res = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // Constructing context context from history
         body: JSON.stringify({
           prompt: userMessage,
           context: chatMessages.map((m) => `${m.role}: ${m.content}`).join("\n") + `\nPatient Profile context: Name ${data.patient.fullName}`,
@@ -68,7 +65,6 @@ export default function PatientDashboard() {
 
   return (
     <div className="min-h-screen bg-[#FDFDFD] font-sans pb-24">
-      {/* Mobile-First Header */}
       <header className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-100 p-4 flex justify-between items-center transition-all duration-300">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-sky-500 text-white flex justify-center items-center shadow-lg shadow-indigo-500/30">
@@ -83,47 +79,35 @@ export default function PatientDashboard() {
           <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
         </button>
       </header>
-      
+
       <main className="max-w-xl mx-auto px-4 py-6 space-y-8">
-        {/* Navigation Tabs */}
         <div className="flex gap-2 overflow-x-auto hide-scrollbar snap-x pb-2">
           {[
-            { id: "home", icon: "🏠", label: "Home" },
-            { id: "hospitals", icon: "🏥", label: "Explore" },
-            { id: "ai", icon: "🧬", label: "Umkho.AI" },
-            { id: "records", icon: "📋", label: "Records" },
-            { id: "financial", icon: "💳", label: "Finance" },
+            { id: "home", label: "Home" },
+            { id: "hospitals", label: "Explore" },
+            { id: "ai", label: "Umkho.AI" },
+            { id: "records", label: "Records" },
+            { id: "financial", label: "Finance" },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`snap-center flex-none px-4 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-2 transition-all duration-300 ${
-                activeTab === tab.id ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20 scale-100" : "bg-white text-gray-500 hover:bg-indigo-50 border border-gray-100 scale-95 opacity-80"
+              className={`snap-center flex-none px-4 py-2.5 rounded-2xl text-sm font-bold transition-all duration-300 ${
+                activeTab === tab.id ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20" : "bg-white text-gray-500 hover:bg-indigo-50 border border-gray-100 opacity-80"
               }`}
             >
-              <span>{tab.icon}</span> {tab.label}
+              {tab.label}
             </button>
           ))}
         </div>
 
-        {/* --- HOME TAB --- */}
         {activeTab === "home" && (
           <div className="space-y-6 animate-fade-in">
-            {/* Vitals / Quick Stats */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gradient-to-br from-rose-50 to-white border border-rose-100 p-5 rounded-3xl shadow-sm">
-                <span className="text-rose-500 text-2xl drop-shadow-sm">🩸</span>
-                <p className="text-gray-500 text-xs font-bold uppercase tracking-wider mt-3">Blood Group</p>
-                <p className="text-xl font-black text-rose-900">{data.patient.bloodGroup || "O+"}</p>
-              </div>
-              <div className="bg-gradient-to-br from-amber-50 to-white border border-amber-100 p-5 rounded-3xl shadow-sm">
-                <span className="text-amber-500 text-2xl drop-shadow-sm">🤧</span>
-                <p className="text-gray-500 text-xs font-bold uppercase tracking-wider mt-3">Allergies</p>
-                <p className="text-lg font-bold text-amber-900 truncate">{data.patient.allergies || "None Reported"}</p>
-              </div>
+              <InfoCard title="Blood Group" value={data.patient.bloodGroup || "O+"} />
+              <InfoCard title="Allergies" value={data.patient.allergies || "None Reported"} />
             </div>
 
-            {/* Upcoming Appointments */}
             <div>
               <div className="flex justify-between items-end mb-4 px-1">
                 <h2 className="font-extrabold text-gray-900 tracking-tight text-xl">Upcoming Visits</h2>
@@ -131,20 +115,13 @@ export default function PatientDashboard() {
               </div>
               <div className="space-y-3">
                 {data.appointments.filter((a: any) => ["pending", "confirmed"].includes(a.status)).length === 0 ? (
-                  <div className="bg-white border border-dashed border-gray-300 rounded-3xl p-8 text-center bg-gray-50/50">
-                    <p className="text-gray-400 font-medium">No upcoming appointments.</p>
-                  </div>
+                  <EmptyCard message="No upcoming appointments." />
                 ) : (
                   data.appointments.filter((a: any) => ["pending", "confirmed"].includes(a.status)).slice(0, 2).map((apt: any) => (
-                    <div key={apt.id} className="bg-white border border-gray-100 p-5 rounded-3xl shadow-sm hover:shadow-md transition-shadow flex items-center gap-4 group">
-                      <div className="bg-indigo-50 text-indigo-600 w-14 h-14 rounded-2xl flex flex-col justify-center items-center font-bold flex-none group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                        <span className="text-xs uppercase leading-none">{new Date(apt.appointmentDate).toLocaleString('default', { month: 'short' })}</span>
-                        <span className="text-xl leading-none mt-1">{new Date(apt.appointmentDate).getDate()}</span>
-                      </div>
-                      <div className="flex-1 overflow-hidden">
-                        <h4 className="font-bold text-gray-900 truncate text-lg">{apt.hospitalName}</h4>
-                        <p className="text-gray-500 text-sm font-medium">{new Date(apt.appointmentDate).toLocaleString('default', { hour: 'numeric', minute: '2-digit' })} • {apt.status}</p>
-                      </div>
+                    <div key={apt.id} className="bg-white border border-gray-100 p-5 rounded-3xl shadow-sm">
+                      <h4 className="font-bold text-gray-900 text-lg">{apt.hospitalName}</h4>
+                      <p className="text-gray-500 text-sm mt-1">{new Date(apt.appointmentDate).toLocaleString()}</p>
+                      <p className="text-indigo-600 text-sm font-semibold mt-2 uppercase tracking-wide">{apt.status}</p>
                     </div>
                   ))
                 )}
@@ -153,40 +130,23 @@ export default function PatientDashboard() {
           </div>
         )}
 
-        {/* --- EXPLORE HOSPITALS TAB --- */}
         {activeTab === "hospitals" && (
-          <div className="space-y-6 animate-fade-in">
-            <h2 className="font-extrabold text-gray-900 tracking-tight text-2xl mb-2">Find Care Facilities</h2>
-            <div className="relative">
-              <input type="text" placeholder="Search near you..." className="w-full bg-white border border-gray-200 p-4 pl-12 rounded-2xl shadow-sm outline-none focus:ring-4 focus:ring-indigo-500/20 font-medium text-gray-700 transition" />
-              <svg className="w-5 h-5 absolute left-4 top-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            </div>
-            
-            <div className="space-y-4 pt-2">
-              {data.availableHospitals.map((hosp: any) => (
-                <div key={hosp.id} className="bg-white border border-gray-100 p-5 rounded-3xl shadow-sm relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50 rounded-bl-full -z-0 opacity-50 transition-transform group-hover:scale-110"></div>
-                  <div className="flex justify-between items-start relative z-10">
-                    <div>
-                      <h4 className="font-bold text-gray-900 text-lg leading-tight">{hosp.name}</h4>
-                      <p className="text-gray-500 text-sm mt-1 mb-3 max-w-[200px] truncate">{hosp.address || "No address provided"}</p>
-                      <button className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold py-2 px-5 rounded-xl shadow-md shadow-indigo-600/20 transition-transform active:scale-95">Book Visit</button>
-                    </div>
-                    <div className="bg-emerald-50 text-emerald-600 w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-sm border border-emerald-100">
-                      ★ 4.9
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div className="space-y-4 animate-fade-in">
+            <h2 className="font-extrabold text-gray-900 tracking-tight text-2xl">Find Care Facilities</h2>
+            {data.availableHospitals.map((hosp: any) => (
+              <div key={hosp.id} className="bg-white border border-gray-100 p-5 rounded-3xl shadow-sm">
+                <h4 className="font-bold text-gray-900 text-lg leading-tight">{hosp.name}</h4>
+                <p className="text-gray-500 text-sm mt-1">{hosp.address || "No address provided"}</p>
+                {hosp.contactNumber && <p className="text-xs text-gray-400 mt-2">{hosp.contactNumber}</p>}
+              </div>
+            ))}
           </div>
         )}
 
-        {/* --- AI ASSISTANT TAB --- */}
         {activeTab === "ai" && (
           <div className="h-[600px] flex flex-col bg-white border border-gray-200 rounded-[2rem] shadow-xl overflow-hidden animate-fade-in relative">
             <div className="bg-gradient-to-r from-indigo-600 to-sky-600 p-5 text-white flex gap-3 items-center sticky top-0 z-10 shadow-md">
-              <div className="w-12 h-12 bg-white/20 rounded-2xl backdrop-blur-sm flex items-center justify-center text-2xl shadow-inner border border-white/20">🧬</div>
+              <div className="w-12 h-12 bg-white/20 rounded-2xl backdrop-blur-sm flex items-center justify-center text-2xl shadow-inner border border-white/20">AI</div>
               <div>
                 <h3 className="font-bold text-lg leading-tight">Umkho.AI Assistant</h3>
                 <p className="text-indigo-100 text-xs font-semibold uppercase tracking-wider">Health Symptom Checker</p>
@@ -199,16 +159,16 @@ export default function PatientDashboard() {
                   <span className="text-white text-xs">AI</span>
                 </div>
                 <div className="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 text-gray-700 text-sm leading-relaxed text-left">
-                  Hello {data.patient.fullName.split(" ")[0]}, I am your AI health companion. Please describe your symptoms or ask me about your medications!
+                  Hello {data.patient.fullName.split(" ")[0]}, I am your AI health companion. Please describe your symptoms or ask me about your medications.
                 </div>
               </div>
 
               {chatMessages.map((msg, i) => (
-                <div key={i} className={`flex gap-3 max-w-[85%] ${msg.role === 'user' ? 'ml-auto flex-row-reverse' : ''}`}>
-                  <div className={`w-8 h-8 rounded-full flex-none flex items-center justify-center shadow-md ${msg.role === 'user' ? 'bg-gray-800' : 'bg-gradient-to-br from-indigo-500 to-sky-500'}`}>
-                    <span className="text-white text-xs">{msg.role === 'user' ? 'YOU' : 'AI'}</span>
+                <div key={i} className={`flex gap-3 max-w-[85%] ${msg.role === "user" ? "ml-auto flex-row-reverse" : ""}`}>
+                  <div className={`w-8 h-8 rounded-full flex-none flex items-center justify-center shadow-md ${msg.role === "user" ? "bg-gray-800" : "bg-gradient-to-br from-indigo-500 to-sky-500"}`}>
+                    <span className="text-white text-xs">{msg.role === "user" ? "YOU" : "AI"}</span>
                   </div>
-                  <div className={`p-4 rounded-2xl shadow-sm border text-sm leading-relaxed text-left ${msg.role === 'user' ? 'bg-gray-800 text-white rounded-tr-none border-gray-700' : 'bg-white text-gray-700 rounded-tl-none border-gray-100'}`}>
+                  <div className={`p-4 rounded-2xl shadow-sm border text-sm leading-relaxed text-left ${msg.role === "user" ? "bg-gray-800 text-white rounded-tr-none border-gray-700" : "bg-white text-gray-700 rounded-tl-none border-gray-100"}`}>
                     {msg.content}
                   </div>
                 </div>
@@ -235,16 +195,87 @@ export default function PatientDashboard() {
           </div>
         )}
 
-        {/* --- OTHER TABS (Records/Finance Placeholder for brevity) --- */}
-        {(activeTab === "records" || activeTab === "financial") && (
-          <div className="bg-white border border-gray-200 rounded-[2rem] p-10 text-center shadow-sm animate-fade-in">
-            <span className="text-4xl">{activeTab === 'records' ? '📋' : '💳'}</span>
-            <h2 className="font-extrabold text-gray-900 mt-4 tracking-tight capitalize">{activeTab} Hub</h2>
-            <p className="text-gray-500 mt-2 text-sm">{activeTab === 'records' ? `You have ${data.records.length} records and ${data.prescriptions.length} prescriptions on file.` : `You have ${data.loans.length} loans and ${data.insurance.length} policies.`}</p>
+        {activeTab === "records" && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="bg-white border border-gray-200 rounded-[2rem] p-6 shadow-sm">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <h2 className="font-extrabold text-gray-900 tracking-tight text-2xl">Medical Records</h2>
+                  <p className="text-gray-500 mt-1 text-sm">Updates uploaded by your hospital and doctors appear here.</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-black text-indigo-700">{data.records.length}</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Records</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {data.records.length === 0 ? (
+                <EmptyCard message="No hospital records have been uploaded yet." />
+              ) : (
+                data.records.map((record: any) => (
+                  <div key={record.id} className="bg-white border border-gray-100 p-5 rounded-3xl shadow-sm">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="font-bold text-gray-900 text-lg">{record.title}</p>
+                        <p className="text-xs font-bold uppercase tracking-widest text-indigo-500 mt-1">
+                          {record.hospitalName || "Hospital update"} {record.doctorName ? `- Dr. ${record.doctorName}` : ""}
+                        </p>
+                      </div>
+                      <span className="text-xs font-semibold text-gray-500">{new Date(record.recordDate).toLocaleDateString()}</span>
+                    </div>
+                    <p className="text-sm text-gray-600 mt-3 leading-relaxed">{record.description}</p>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-[2rem] p-6 shadow-sm">
+              <h3 className="font-extrabold text-gray-900 tracking-tight text-xl">Prescriptions</h3>
+              <div className="mt-4 space-y-3">
+                {data.prescriptions.length === 0 ? (
+                  <p className="text-sm text-gray-400">No prescriptions uploaded yet.</p>
+                ) : (
+                  data.prescriptions.map((prescription: any) => (
+                    <div key={prescription.id} className="rounded-2xl border border-gray-100 bg-gray-50/60 p-4">
+                      <p className="font-bold text-gray-900">{prescription.medication}</p>
+                      <p className="text-sm text-gray-600 mt-1">{prescription.dosage || "Dosage not specified"}</p>
+                      {prescription.instructions && <p className="text-sm text-gray-500 mt-2">{prescription.instructions}</p>}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
           </div>
         )}
 
+        {activeTab === "financial" && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="bg-white border border-gray-200 rounded-[2rem] p-6 shadow-sm">
+              <h2 className="font-extrabold text-gray-900 tracking-tight text-2xl">Financial Hub</h2>
+              <p className="text-gray-500 mt-1 text-sm">{`You have ${data.loans.length} loans and ${data.insurance.length} policies.`}</p>
+            </div>
+          </div>
+        )}
       </main>
+    </div>
+  );
+}
+
+function InfoCard({ title, value }: { title: string; value: string }) {
+  return (
+    <div className="bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 p-5 rounded-3xl shadow-sm">
+      <p className="text-gray-500 text-xs font-bold uppercase tracking-wider">{title}</p>
+      <p className="text-xl font-black text-indigo-900 mt-3">{value}</p>
+    </div>
+  );
+}
+
+function EmptyCard({ message }: { message: string }) {
+  return (
+    <div className="bg-white border border-dashed border-gray-300 rounded-3xl p-8 text-center bg-gray-50/50">
+      <p className="text-gray-400 font-medium">{message}</p>
     </div>
   );
 }

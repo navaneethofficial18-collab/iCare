@@ -2,19 +2,44 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
+async function readApiResponse(res: Response) {
+  const contentType = res.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    throw new Error("The server returned an unexpected response.");
+  }
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data?.error ?? "Request failed");
+  }
+
+  return data;
+}
+
 export default function AdminForgotPassword() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     setLoading(true);
-    setTimeout(() => {
-      setMessage("If an admin profile exists, secure instructions have been sent.");
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await readApiResponse(res);
+      setMessage(data.message);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -28,6 +53,11 @@ export default function AdminForgotPassword() {
         {message && (
           <div className="bg-emerald-500/20 border border-emerald-500 text-emerald-100 p-4 rounded-lg mb-6 text-sm">
             <p>{message}</p>
+          </div>
+        )}
+        {error && (
+          <div className="bg-red-500/20 border border-red-500 text-red-100 p-4 rounded-lg mb-6 text-sm">
+            <p>{error}</p>
           </div>
         )}
 

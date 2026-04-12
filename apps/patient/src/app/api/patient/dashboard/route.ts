@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { patientsTable, hospitalsTable, appointmentsTable, admissionsTable, medicalRecordsTable, prescriptionsTable, loansTable, insurancePoliciesTable } from "@/db/schema";
+import { patientsTable, hospitalsTable, appointmentsTable, admissionsTable, medicalRecordsTable, prescriptionsTable, loansTable, insurancePoliciesTable, doctorsTable, usersTable } from "@/db/schema";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 import { eq, desc } from "drizzle-orm";
+import { AUTH_COOKIE_NAME } from "@/lib/auth-cookie";
 
 async function verifyPatient() {
   const cookieStore = await cookies();
-  const token = cookieStore.get("jwt")?.value;
+  const token = cookieStore.get(AUTH_COOKIE_NAME)?.value;
   if (!token) return null;
 
   try {
@@ -47,7 +48,20 @@ export async function GET() {
     .where(eq(appointmentsTable.patientId, patient.id))
     .orderBy(desc(appointmentsTable.appointmentDate));
 
-    const records = await db.select().from(medicalRecordsTable).where(eq(medicalRecordsTable.patientId, patient.id)).orderBy(desc(medicalRecordsTable.recordDate));
+    const records = await db.select({
+      id: medicalRecordsTable.id,
+      title: medicalRecordsTable.title,
+      description: medicalRecordsTable.description,
+      fileUrl: medicalRecordsTable.fileUrl,
+      recordDate: medicalRecordsTable.recordDate,
+      hospitalName: hospitalsTable.name,
+      doctorName: doctorsTable.fullName,
+    })
+    .from(medicalRecordsTable)
+    .leftJoin(hospitalsTable, eq(medicalRecordsTable.hospitalId, hospitalsTable.id))
+    .leftJoin(doctorsTable, eq(medicalRecordsTable.doctorId, doctorsTable.id))
+    .where(eq(medicalRecordsTable.patientId, patient.id))
+    .orderBy(desc(medicalRecordsTable.recordDate));
     const prescriptions = await db.select().from(prescriptionsTable).where(eq(prescriptionsTable.patientId, patient.id)).orderBy(desc(prescriptionsTable.createdAt));
     const loans = await db.select().from(loansTable).where(eq(loansTable.patientId, patient.id)).orderBy(desc(loansTable.createdAt));
     const insurance = await db.select().from(insurancePoliciesTable).where(eq(insurancePoliciesTable.patientId, patient.id)).orderBy(desc(insurancePoliciesTable.createdAt));

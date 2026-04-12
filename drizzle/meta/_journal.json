@@ -15,6 +15,13 @@
       "when": 1774773728226,
       "tag": "0001_flaky_vertigo",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1775331683187,
+      "tag": "0002_public_slayback",
+      "breakpoints": true
     }
   ]
 }

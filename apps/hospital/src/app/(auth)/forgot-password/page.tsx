@@ -2,19 +2,44 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
+async function readApiResponse(res: Response) {
+  const contentType = res.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    throw new Error("The server returned an unexpected response.");
+  }
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data?.error ?? "Request failed");
+  }
+
+  return data;
+}
+
 export default function HospitalForgotPassword() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     setLoading(true);
-    setTimeout(() => {
-      setMessage("If a provider account exists for this email, we have sent a password reset link.");
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await readApiResponse(res);
+      setMessage(data.message);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -28,6 +53,11 @@ export default function HospitalForgotPassword() {
         {message && (
           <div className="bg-green-50 text-green-700 p-4 rounded-lg mb-6 text-sm relative z-10 border border-green-100">
             <p>{message}</p>
+          </div>
+        )}
+        {error && (
+          <div className="bg-red-50 text-red-700 p-4 rounded-lg mb-6 text-sm relative z-10 border border-red-100">
+            <p>{error}</p>
           </div>
         )}
 

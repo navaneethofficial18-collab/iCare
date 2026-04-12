@@ -43,3 +43,23 @@ export async function sendHospitalWelcomeEmail(email: string, hospitalName: stri
     `,
   });
 }
+
+export async function sendPasswordResetEmail(email: string, resetUrl: string) {
+  const transporter = getTransporter();
+
+  await transporter.sendMail({
+    from: getFromAddress(),
+    to: email,
+    subject: "Reset your CareSync hospital password",
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111827;">
+        <h2 style="margin-bottom: 12px;">Reset your CareSync hospital password</h2>
+        <p>We received a request to reset your provider password.</p>
+        <p>Click the secure link below to choose a new password:</p>
+        <p><a href="${resetUrl}">${resetUrl}</a></p>
+        <p>This link will expire in 1 hour.</p>
+        <p>If you did not request this, you can ignore this email.</p>
+      </div>
+    `,
+  });
+}
