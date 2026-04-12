@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
-import { db, ensureAdminUser } from "@/db";
+Dimport { db, ensureAdminUser } from "@/db";
 import { usersTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { signToken } from "@/lib/auth";
-import { AUTH_COOKIE_NAME } from "@/lib/auth-cookie";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -16,7 +15,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ role: s
   try {
     const p = await params;
     const { role } = p;
-    
+
     if (!["patient", "hospital", "admin"].includes(role)) {
       return NextResponse.json({ error: "Invalid role specified in URL" }, { status: 400 });
     }
@@ -50,7 +49,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ role: s
     const token = await signToken({ sub: user.id, role: user.role, email: user.email });
 
     const response = NextResponse.json({ message: "Login successful", role: user.role });
-    response.cookies.set(AUTH_COOKIE_NAME, token, {
+    response.cookies.set("jwt", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
