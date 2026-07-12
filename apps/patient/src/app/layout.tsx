@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "iCare | Healthcare that works anywhere",
+  title: "MedeonAI | Healthcare that works anywhere",
   description: "A unified healthcare ecosystem replacing traditional hospital systems and storing lifelong medical data.",
 };
 

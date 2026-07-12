@@ -57,7 +57,7 @@ export default function PatientDashboard() {
       const json = await res.json();
       setChatMessages((prev) => [...prev, { role: "ai", content: json.response || json.error }]);
     } catch {
-      setChatMessages((prev) => [...prev, { role: "ai", content: "Error connecting to Umkho.AI Server." }]);
+      setChatMessages((prev) => [...prev, { role: "ai", content: "Error connecting to CareSync AI Server." }]);
     } finally {
       setAiLoading(false);
     }
@@ -75,7 +75,7 @@ export default function PatientDashboard() {
             <span className="font-bold text-lg">CS</span>
           </div>
           <div>
-            <h1 className="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-800 to-sky-700 tracking-tight">iCare</h1>
+            <h1 className="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-800 to-sky-700 tracking-tight">MedeonAI</h1>
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mt-0.5">Welcome, {data.patient.fullName.split(" ")[0]}</p>
           </div>
         </div>
@@ -90,7 +90,7 @@ export default function PatientDashboard() {
           {[
             { id: "home", icon: "🏠", label: "Home" },
             { id: "hospitals", icon: "🏥", label: "Explore" },
-            { id: "ai", icon: "🧬", label: "Umkho.AI" },
+            { id: "ai", icon: "🧬", label: "CareSync AI" },
             { id: "records", icon: "📋", label: "Records" },
             { id: "financial", icon: "💳", label: "Finance" },
           ].map((tab) => (
@@ -188,7 +188,7 @@ export default function PatientDashboard() {
             <div className="bg-gradient-to-r from-indigo-600 to-sky-600 p-5 text-white flex gap-3 items-center sticky top-0 z-10 shadow-md">
               <div className="w-12 h-12 bg-white/20 rounded-2xl backdrop-blur-sm flex items-center justify-center text-2xl shadow-inner border border-white/20">🧬</div>
               <div>
-                <h3 className="font-bold text-lg leading-tight">Umkho.AI Assistant</h3>
+                <h3 className="font-bold text-lg leading-tight">CareSync AI Assistant</h3>
                 <p className="text-indigo-100 text-xs font-semibold uppercase tracking-wider">Health Symptom Checker</p>
               </div>
             </div>

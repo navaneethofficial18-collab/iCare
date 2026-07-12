@@ -38,7 +38,7 @@ export default function UserRegister() {
     <div className="flex items-center justify-center flex-1 bg-gradient-to-br from-indigo-50 via-white to-sky-50 p-4 sm:p-8">
       <div className="w-full max-w-md bg-white/70 backdrop-blur-xl p-8 rounded-2xl shadow-2xl border border-white/50 relative overflow-hidden">
         <div className="text-center mb-8 relative z-10">
-          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-sky-600 mb-2 tracking-tight">iCare</h1>
+          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-sky-600 mb-2 tracking-tight">MedeonAI</h1>
           <p className="text-gray-500 font-medium tracking-wide">Create your Member account</p>
         </div>
 
@@ -49,7 +49,7 @@ export default function UserRegister() {
           <div><label className="block text-sm font-semibold text-gray-700 mb-1.5">Email</label><input type="email" name="email" className="w-full p-3 border border-gray-200 rounded-xl" value={formData.email} onChange={handleChange} required /></div>
           <div><label className="block text-sm font-semibold text-gray-700 mb-1.5">Password</label><input type="password" name="password" className="w-full p-3 border border-gray-200 rounded-xl" value={formData.password} onChange={handleChange} minLength={6} required /></div>
           
-          <button type="submit" disabled={loading} className="w-full mt-2 bg-gradient-to-r from-indigo-600 to-sky-600 text-white font-bold py-3.5 px-4 rounded-xl">{loading ? "Registering..." : "Join iCare"}</button>
+          <button type="submit" disabled={loading} className="w-full mt-2 bg-gradient-to-r from-indigo-600 to-sky-600 text-white font-bold py-3.5 px-4 rounded-xl">{loading ? "Registering..." : "Join MedeonAI"}</button>
         </form>
 
         <p className="text-center mt-8 text-sm font-medium text-gray-600 relative z-10 border-t border-gray-100 pt-6">

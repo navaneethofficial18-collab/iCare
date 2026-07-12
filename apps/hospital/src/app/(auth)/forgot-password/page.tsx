@@ -46,7 +46,7 @@ export default function HospitalForgotPassword() {
     <div className="flex items-center justify-center flex-1 bg-gradient-to-br from-emerald-50 via-white to-teal-50 p-4 sm:p-8">
       <div className="w-full max-w-md bg-white/70 backdrop-blur-xl p-8 rounded-2xl shadow-2xl border border-white/50 relative overflow-hidden">
         <div className="text-center mb-8 relative z-10">
-          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 mb-2 tracking-tight">iCare Hospital</h1>
+          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 mb-2 tracking-tight">MedeonAI Hospital</h1>
           <p className="text-gray-500 font-medium">Provider Portal Recovery</p>
         </div>
 

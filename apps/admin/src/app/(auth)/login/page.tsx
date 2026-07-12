@@ -37,7 +37,7 @@ export default function AdminLogin() {
     <div className="flex items-center justify-center flex-1 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4 sm:p-8">
       <div className="w-full max-w-md bg-white/10 backdrop-blur-3xl p-8 rounded-3xl shadow-2xl border border-white/20">
         <div className="text-center mb-8 relative z-10">
-          <h1 className="text-3xl font-extrabold text-white mb-2 tracking-tight">iCare Company</h1>
+          <h1 className="text-3xl font-extrabold text-white mb-2 tracking-tight">MedeonAI Company</h1>
           <p className="text-gray-400 font-medium">Administrator Login</p>
         </div>
 

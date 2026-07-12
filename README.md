@@ -1,6 +1,6 @@
 # CareSync &mdash; Healthcare that works anywhere
 
-CareSync is a fully unified healthcare ecosystem built to replace traditional hospital databases. Designed for offline-first environments, it enables hospitals and patients to reliably manage medical records, token queues, and insurance across the globe. Powered by **Umkho.AI**, CareSync uses Hugging Face models for on-demand symptom diagnosis and multi-language translations.
+CareSync is a fully unified healthcare ecosystem built to replace traditional hospital databases. Designed for offline-first environments, it enables hospitals and patients to reliably manage medical records, token queues, and insurance across the globe. Powered by **CareSync AI**, CareSync uses Hugging Face models for on-demand symptom diagnosis and multi-language translations.
 
 ## Core Features
 - **Offline-First Sync Engine**: Uses PWA and IndexedDB (Dexie) to queue actions offline and sync when connection is restored.

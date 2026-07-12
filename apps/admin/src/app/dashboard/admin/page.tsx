@@ -106,7 +106,7 @@ export default function AdminDashboard() {
       <header className="bg-white shadow-sm px-6 py-4 flex justify-between items-center sticky top-0 z-40 border-b border-gray-200">
         <div className="font-bold text-xl text-indigo-900 flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex justify-center items-center text-sm shadow-md">CS</div>
-          iCare 
+          MedeonAI 
           <span className="text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-full font-bold text-xs ml-2 border border-indigo-100 uppercase tracking-wide">Admin Portal</span>
         </div>
         <div className="flex items-center gap-4">

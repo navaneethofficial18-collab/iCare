@@ -1,0 +1,73 @@
+# Decouple Workflow and Project Creation
+
+The goal is to move the workflow-to-project mapping logic from the workflow creation service to the project creation service. This allows workflows to be created independently of projects, and associations to be established when a project is initialized.
+
+## User Review Required
+
+> [!IMPORTANT]
+> - `workflow_steps.project_id` will be **REMOVED** from the database schema.
+> - `workflowIds` will be supported in the project creation request (as an array) to establish mappings.
+
+## Proposed Changes
+
+### Database Schema
+
+#### [DELETE] project_id from [workflow_steps.ts](file:///d:/Qwikspec/qwikspec-platform/app/db/schema/workflow_steps.ts)
+- Remove the `project_id` column and its foreign key constraint.
+
+---
+
+### Data Types
+
+#### [MODIFY] [workflows.ts](file:///d:/Qwikspec/qwikspec-platform/app/types/workflows.ts)
+- Remove `projectId` from `CreateWorkflow`.
+
+#### [MODIFY] [projects.ts](file:///d:/Qwikspec/qwikspec-platform/app/types/projects.ts)
+- Add `workflowIds: string[]` to `CreateProject`.
+
+---
+
+### Services
+
+#### [MODIFY] [workflows.ts](file:///d:/Qwikspec/qwikspec-platform/app/services/workflows.ts)
+- Remove `WorkflowProjectMapRepository` instantiation and usage in `createWorkflow` and `updateWorkflow`.
+- Stop passing `projectId` to step creation.
+
+#### [MODIFY] [project.ts](file:///d:/Qwikspec/qwikspec-platform/app/services/project.ts)
+- Update `createProject` to:
+    - Accept `workflowIds` (array of strings).
+    - Use `WorkflowRepository` to fetch the latest `versionId` for each specified `workflowId`.
+    - Use a database transaction to:
+        1. Create the project.
+        2. Create multiple mappings in `workflow_project_map` (one for each workflow).
+
+---
+
+---
+
+### Repositories & Utilities
+- No new repository methods required.
+
+---
+
+### Services
+
+#### [MODIFY] [project.ts](file:///d:/Qwikspec/qwikspec-platform/app/services/project.ts)
+- Update `createProject` to accept `workflowIds` and insert mappings into `workflow_project_map`.
+
+---
+
+## Open Questions
+- None.
+
+## Verification Plan
+
+### Automated Tests
+- Create a workflow without a project ID.
+- Create a project with an array of workflow IDs.
+- Verify that `workflow_project_map` contains the correct entries.
+- Verify that the project is created successfully and steps are updated.
+
+### Manual Verification
+- Test Workflow creation via API.
+- Test Project creation with mapping via API.

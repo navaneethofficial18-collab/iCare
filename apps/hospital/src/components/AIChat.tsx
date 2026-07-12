@@ -27,7 +27,7 @@ export default function AIChat() {
   return (
     <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm mt-6">
       <h3 className="text-xl font-bold text-gray-800 mb-2">🤖 AI Doctor Assistant</h3>
-      <p className="text-gray-500 text-sm mb-4">Describe your symptoms for a preliminary analysis powered by Umkho.AI.</p>
+      <p className="text-gray-500 text-sm mb-4">Describe your symptoms for a preliminary analysis powered by CareSync AI.</p>
       <textarea
         className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition resize-none h-24 text-gray-800"
         placeholder="E.g., I have a severe headache, slight fever, and feel nauseous..."

@@ -33,7 +33,7 @@ export default function HospitalDashboard() {
       <header className="bg-white shadow px-6 py-4 flex justify-between items-center sticky top-0 z-40 border-b border-gray-200">
         <div className="font-bold text-xl text-sky-900 flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-sky-600 text-white flex justify-center items-center text-sm shadow">CS</div>
-          iCare 
+          MedeonAI 
           <span className="text-sky-700 bg-sky-50 px-2 flex-none py-1 rounded-full font-bold text-xs ml-2 border border-sky-100 uppercase tracking-wide">
             {data.hospital.name}
           </span>
@@ -125,7 +125,7 @@ export default function HospitalDashboard() {
         {activeTab === "ai-manager" && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center mt-6">
             <div className="w-16 h-16 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl shadow-sm">🤖</div>
-            <h2 className="text-2xl font-bold text-gray-900">Umkho.AI Hospital Manager</h2>
+            <h2 className="text-2xl font-bold text-gray-900">CareSync AI Hospital Manager</h2>
             <p className="text-gray-500 mt-2 max-w-lg mx-auto">Analyze patient symptoms smartly, efficiently allocate doctors based on load, and auto-summarize recent medical records.</p>
             <div className="mt-8 mx-auto max-w-xl text-left border border-gray-200 rounded-xl overflow-hidden shadow-sm">
               <div className="bg-gray-50 p-4 border-b border-gray-200 flex items-center gap-2">
