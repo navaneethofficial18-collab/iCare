@@ -46,4 +46,5 @@ npm run dev
 The app will be running at [http://localhost:3000](http://localhost:3000).
 
 ---
-**Designed by Antigravity AI**.
+
+
